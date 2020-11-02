@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 namespace WebAPI.Models
 {
@@ -10,14 +9,9 @@ namespace WebAPI.Models
     {
         public List<Datum> GetTheRecords(string sqlQuery)
         {
-            SqlConnectionStringBuilder connString = new SqlConnectionStringBuilder();
-            connString.UserID = "sa";
-            connString.Password = "Technology3";
-            connString.DataSource = "l2.kaje.ucnit20.eu";
-            connString.IntegratedSecurity = false; // if true then windows authentication
-            connString.InitialCatalog = "Corona";
+            SqlConnection connDB;
             List<Datum> theReply = new List<Datum>();
-            using (SqlConnection connDB = new SqlConnection(connString.ConnectionString))
+            using (connDB = new SqlConnection("Data Source=localhost;Initial Catalog=Corona;Persist Security Info=True;Integrated Security=true;"))
             {
                 try
                 {
@@ -45,6 +39,43 @@ namespace WebAPI.Models
 
             }
             return (theReply);
+        }
+
+
+        public bool insertRecord(Datum datum)
+        {
+            SqlConnection connDB;
+            using (connDB = new SqlConnection("Data Source=localhost;Initial Catalog=Corona;Persist Security Info=True;Integrated Security=true;"))
+            {
+                try
+                {
+                    string countrycode = datum.countrycode;
+                    string date = datum.date;
+                    int cases = Convert.ToInt32(datum.cases);
+                    string deaths = datum.deaths;
+                    string recovered = datum.recovered;
+
+                    connDB.Open();
+                    string sqlString = "Insert into theStats values(@countrycode, @date, @cases, @deaths, @recovered)";
+
+                    var sqlCmd = new SqlCommand(sqlString, connDB);
+
+                    sqlCmd.Parameters.Add("countrycode", SqlDbType.VarChar).Value = countrycode;
+                    sqlCmd.Parameters.Add("date", SqlDbType.SmallDateTime).Value = date;
+                    sqlCmd.Parameters.Add("cases", SqlDbType.Int).Value = cases;
+                    sqlCmd.Parameters.Add("deaths", SqlDbType.Int).Value = deaths;
+                    sqlCmd.Parameters.Add("recovered", SqlDbType.Int).Value = recovered;
+                    sqlCmd.ExecuteNonQuery();
+                    connDB.Close();
+                    return true;
+                }
+                catch (SqlException ex)
+                {
+                    throw ex;
+                    return false;
+                   
+                }
+            }
         }
     }
 }

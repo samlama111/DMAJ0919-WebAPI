@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using WebAPI.Models;
 
@@ -27,17 +24,24 @@ namespace WebAPI.Controllers
         // GET: api/Corona/5
         public string Get(int id)
         {
+
             return "value";
         }
 
         // POST: api/Corona
-        public void Post([FromBody]string value)
+        public bool Post(Datum datum)
         {
+           
+            CoronaOperations coop = new CoronaOperations();
+            bool res = coop.insertRecord(datum);
+
+            return res;
         }
 
         // PUT: api/Corona/5
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] string value)
         {
+
         }
 
         // DELETE: api/Corona/5
